@@ -1,13 +1,18 @@
-"""This module contains calculator functions."""
-
-from calculator import add, substract
+'''My Calculator Test'''
+from calculator import Calculator
 
 def test_addition():
-    """Tests that add() correctly adds two numbers."""
-    assert add(2, 2) == 4
+    '''Test that addition function works '''    
+    assert Calculator.add(2,2) == 4
 
-def test_substraction():
-    """Tests that add() correctly adds two numbers."""
-    assert substract(2, 2) == 0
+def test_subtraction():
+    '''Test that addition function works '''    
+    assert Calculator.subtract(2,2) == 0
 
-# Ensure the file ends with a newline
+def test_multiply():
+    '''Test that addition function works '''    
+    assert Calculator.multiply(2,2) == 4
+
+def test_divide():
+    '''Test that addition function works '''    
+    assert Calculator.divide(2,2) == 1
