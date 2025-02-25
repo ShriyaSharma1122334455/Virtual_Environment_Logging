@@ -1,0 +1,37 @@
+from calculator.commands import Command
+
+class MenuCommand(Command):
+    """
+    MenuCommand class to display all available commands dynamically.
+
+    This command class inherits from the Command class and implements the
+    execute method to fetch and display all registered commands from the
+    command handler.
+    """
+
+    def __init__(self, command_handler):
+        """
+        Initializes the MenuCommand with a reference to the command handler.
+
+        This allows dynamic retrieval of the list of commands that have been
+        registered in the command handler.
+
+        Args:
+            command_handler: The handler responsible for managing registered commands.
+        """
+        self.command_handler = command_handler
+
+    def execute(self):
+        """
+        Displays all available commands dynamically.
+
+        This method retrieves the registered commands from the command handler
+        and prints them in a sorted order. Also, displays a prompt to quit the application.
+        """
+        print("\nAvailable Commands:\n" + "-" * 20)
+        for command in sorted(self.command_handler.commands.keys()):
+            print(f" - {command}")
+        print("\nType 'quit' to exit.\n")
+
+# Expose the MenuCommand class for external use
+__all__ = ["MenuCommand"]
