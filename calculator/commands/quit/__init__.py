@@ -1,3 +1,10 @@
+"""
+Module for the QuitCommand class.
+
+This module provides the QuitCommand class, which allows users to exit 
+the program gracefully with a farewell message.
+"""
+
 import sys
 from calculator.commands import Command
 

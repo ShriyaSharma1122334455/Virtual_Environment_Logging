@@ -1,5 +1,13 @@
-from calculator.commands import Command
+"""
+Module for the DivideCommand class.
+
+This module provides the DivideCommand class, which performs the division 
+of two numerical arguments while handling errors such as invalid input and 
+division by zero.
+"""
+
 from decimal import Decimal, InvalidOperation, DivisionByZero
+from calculator.commands import Command
 
 class DivideCommand(Command):
     """

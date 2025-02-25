@@ -1,3 +1,11 @@
+"""
+Module for testing the Calculator CLI.
+
+This module contains unit tests for the Calculator CLI, specifically 
+testing the execution of various commands such as add, subtract, 
+multiply, divide, and menu.
+"""
+
 import unittest
 import sys
 import io
@@ -9,6 +17,13 @@ from calculator.commands.divide import DivideCommand
 from calculator.commands.menu import MenuCommand
 
 class TestCalculator(unittest.TestCase):
+    """
+    TestCalculator class to test the functionality of the Calculator CLI.
+
+    This class contains unit tests for the commands available in the 
+    Calculator CLI. It tests both valid and invalid commands.
+    """
+
     def setUp(self):
         """Initialize CommandHandler and register commands."""
         self.handler = CommandHandler()
@@ -28,7 +43,7 @@ class TestCalculator(unittest.TestCase):
 
     def test_execute_valid_command(self):
         """Test executing a valid command (addition)."""
-        output = self.capture_output(self.handler.execute_command, "add", "10", "5")  # Pass arguments separately
+        output = self.capture_output(self.handler.execute_command, "add", "10", "5")
         self.assertEqual(output, "The Solution of addition is 15")
 
     def test_execute_invalid_command(self):
