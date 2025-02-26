@@ -1,5 +1,12 @@
-from calculator.commands import Command
+"""
+Module for the SubtractCommand class.
+
+This module provides the SubtractCommand class, which performs the subtraction 
+of two numerical arguments while handling invalid input errors.
+"""
+
 from decimal import Decimal, InvalidOperation
+from calculator.commands import Command
 
 class SubtractCommand(Command):
     """

@@ -1,3 +1,10 @@
+"""
+Module for the WelcomeCommand class.
+
+This module provides the WelcomeCommand class, which displays a welcome 
+message when executed.
+"""
+
 from calculator.commands import Command
 
 class WelcomeCommand(Command):

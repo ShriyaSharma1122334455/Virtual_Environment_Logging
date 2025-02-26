@@ -1,6 +1,5 @@
 """
 Module for the Calculator CLI and its command registration and execution.
-
 This module contains the Calculator class that registers and manages commands
 for operations like add, subtract, multiply, divide, etc. It also manages
 the user interaction through a command-line interface.

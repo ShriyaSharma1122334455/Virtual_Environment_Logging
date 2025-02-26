@@ -1,3 +1,10 @@
+"""
+Module defining the Command pattern for managing operations.
+
+This module provides an abstract base class Command for creating specific
+commands and a CommandHandler class to register and execute those commands.
+"""
+
 from abc import ABC, abstractmethod
 
 class Command(ABC):
@@ -13,8 +20,6 @@ class Command(ABC):
         """
         Abstract method that should be implemented by subclasses to execute a specific command.
         """
-        pass
-
 
 class CommandHandler:
     """

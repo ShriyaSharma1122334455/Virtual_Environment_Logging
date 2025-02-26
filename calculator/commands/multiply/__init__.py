@@ -1,5 +1,12 @@
-from calculator.commands import Command
+"""
+Module for the MultiplyCommand class.
+
+This module provides the MultiplyCommand class, which performs the multiplication 
+of two numerical arguments while handling invalid input errors.
+"""
+
 from decimal import Decimal, InvalidOperation
+from calculator.commands import Command
 
 class MultiplyCommand(Command):
     """

@@ -1,3 +1,11 @@
+"""
+Module for the MenuCommand class.
+
+This module provides the MenuCommand class, which dynamically displays 
+all available commands registered in the command handler. It helps users 
+view available commands and navigate the command-line interface.
+"""
+
 from calculator.commands import Command
 
 class MenuCommand(Command):
