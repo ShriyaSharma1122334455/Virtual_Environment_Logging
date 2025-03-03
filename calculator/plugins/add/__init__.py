@@ -7,8 +7,13 @@ and implements the execute method to carry out the addition. It includes error
 handling for invalid input and ensures exactly two arguments are provided.
 """
 
+import logging
 from decimal import Decimal, InvalidOperation
 from calculator.commands import Command
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 class AddCommand(Command):
     """
@@ -29,6 +34,8 @@ class AddCommand(Command):
             ValueError: If the number of arguments is not exactly two.
             InvalidOperation: If the arguments cannot be converted to Decimal.
         """
+        logger.info("Executing addition command with arguments: %s", args)
+
         if not self.validate_args(args):
             return
 
@@ -36,8 +43,10 @@ class AddCommand(Command):
             # Convert arguments to Decimal and perform addition
             a, b = map(Decimal, args)
             result = a + b
+            logger.info("Addition result: %s + %s = %s", a, b, result)
             print(f"The Solution of addition is {result}")
         except InvalidOperation:
+            logger.error("Invalid input: Unable to convert arguments to Decimal.")
             print("Error: Invalid input")
 
     def validate_args(self, args):
@@ -52,8 +61,10 @@ class AddCommand(Command):
                   False otherwise.
         """
         if len(args) != 2:
+            logger.warning("Error: Addition requires exactly two numerical arguments, received %d", len(args))
             print("Error: Addition requires exactly two numerical arguments")
             return False
+        logger.info("Arguments validated successfully: %s", args)
         return True
 
 # Expose the AddCommand class for external use

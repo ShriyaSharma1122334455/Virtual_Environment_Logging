@@ -1,25 +1,15 @@
 """
-Calculator CLI Application
-
-This module defines a Calculator class that manages a command-line interface (CLI) for 
-a calculator application. The class dynamically loads plugins from the `calculator.plugins` 
-package, allowing for extension of functionality through user-defined commands.
-
-The Calculator supports registering commands, executing them through user input, and 
-providing a loop for interaction. Commands can be extended by creating plugins that 
-inherit from the `Command` class.
-
-Modules and classes:
-    - Calculator: Manages the calculator CLI, command handling, and plugin loading.
-    - CommandHandler: Handles the execution and registration of commands.
-    - Command: The base class for commands that can be executed by the Calculator.
-    - Plugins: Dynamically loaded modules in the `calculator.plugins` package, 
-      which can extend the calculator functionality.
+Calculator module for managing the command-line interface (CLI) calculator.
+Supports dynamically loading plugins that extend functionality.
 """
 
+import os
 import pkgutil
 import importlib
 import inspect
+import logging
+import logging.config
+from dotenv import load_dotenv
 from calculator.commands import CommandHandler, Command
 import calculator.plugins  # Import the plugins package
 
@@ -30,68 +20,104 @@ class Calculator:
 
     Attributes:
         command_handler (CommandHandler): Manages and executes commands in the calculator CLI.
+        settings (dict): Stores environment variables.
     """
 
     def __init__(self):
         """
         Initializes the Calculator with a CommandHandler instance.
-        Additionally, loads any available plugins that extend the Command class.
+        Loads environment variables and configures logging.
         """
+        self.setup_logging()
+        load_dotenv()
+        self.settings = self.load_environment_variables()
         self.command_handler = CommandHandler()
         self.load_plugins()
 
+    def setup_logging(self):
+        """
+        Configures logging settings, creating a 'logs' directory if it doesn't exist.
+        Loads logging configuration from 'logging.conf' or sets basic logging configuration.
+        """
+        os.makedirs('logs', exist_ok=True)
+        logging_conf_path = 'logging.conf'
+        if os.path.exists(logging_conf_path):
+            logging.config.fileConfig(logging_conf_path, disable_existing_loggers=False)
+        else:
+            logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+        logging.info("Logging initialized.")
+
+    def load_environment_variables(self):
+        """
+        Loads environment variables into a dictionary and logs the process.
+
+        Returns:
+            dict: A dictionary containing environment variables.
+        """
+        settings = dict(os.environ.items())  # Replaced the comprehension with the suggested method
+        logging.info("Environment variables loaded.")
+        return settings
+
     def load_plugins(self):
         """
-        Dynamically loads all plugins from the `calculator.plugins` package.
-
-        This method scans the `calculator.plugins` package for modules and attempts 
-        to find any class that inherits from the `Command` class. If such a class is 
-        found, it is instantiated and registered with the command handler.
+        Dynamically loads all plugins from the `calculator.plugins` package and registers commands.
+        Logs each plugin load and command registration.
         """
-        all_package = calculator.plugins  # Assign the actual module
-
-        # Loop through all modules in the calculator.plugins package
+        all_package = calculator.plugins
+        
         for _, module_name, _ in pkgutil.iter_modules(
                 all_package.__path__, all_package.__name__ + "."):
-            module = importlib.import_module(module_name)
+            try:
+                module = importlib.import_module(module_name)
+                logging.info("Loaded plugin module: %s", module_name)  # Changed to lazy formatting
+            except ImportError as e:
+                logging.error("Error loading plugin %s: %s", module_name, e)  # Changed to lazy formatting
+                continue
 
-            # Find any class that inherits from Command
             for attr_name in dir(module):
                 attr = getattr(module, attr_name)
                 if isinstance(attr, type) and issubclass(attr, Command) and attr is not Command:
                     try:
-                        # Use inspect to check if __init__ requires command_handler
                         init_signature = inspect.signature(attr.__init__)
-                        if "command_handler" in init_signature.parameters:
-                            command_instance = attr(self.command_handler)  # Pass the handler
-                        else:
-                            command_instance = attr()  # Instantiate normally
-
-                        command_name = getattr(command_instance, 'command_name',
-                                                module_name.split(".")[-1])
+                        command_instance = attr(self.command_handler) if "command_handler" in init_signature.parameters else attr()
+                        command_name = getattr(command_instance, 'command_name', module_name.split(".")[-1])
                         self.command_handler.register_command(command_name, command_instance)
+                        logging.info("Registered command: %s", command_name)  # Changed to lazy formatting
                     except TypeError as e:
-                        print(f"Skipping {attr_name}: {e}")  # Log errors instead of crashing
+                        logging.warning("Skipping %s due to error: %s", attr_name, e)  # Changed to lazy formatting
 
     def start(self):
         """
-        Starts the command-line interface (CLI) loop for the calculator.
-
-        This method enters a loop, waiting for user input, and executes the corresponding
-        command if found. The loop continues until the user types 'quit' to exit.
+        Starts the CLI loop for the calculator, accepting user commands until 'quit' is entered.
+        Handles invalid inputs and logs errors.
         """
+        logging.info("Calculator CLI started.")
         print("Calculator CLI - Type 'quit' to exit OR Menu to Continue")
         while True:
-            user_input = input(">>> ").strip()
-            if user_input.lower() == "quit":
-                print("Exiting calculator. Goodbye!")
-                break  # Exit loop when 'quit' is entered
+            try:
+                user_input = input(">>> ").strip()
+                if user_input.lower() == "quit":
+                    logging.info("Exiting calculator.")
+                    print("Goodbye!")
+                    break
+                
+                parts = user_input.split(maxsplit=1)
+                command_name = parts[0] if parts else ''
+                args = parts[1].split() if len(parts) > 1 else []
 
-            parts = user_input.split(maxsplit=1)
-            command_name = parts[0] if parts else ''
-            args = parts[1].split() if len(parts) > 1 else []
+                if command_name:
+                    self.command_handler.execute_command(command_name, *args)
+                else:
+                    logging.warning("Invalid command entered.")
+                    print("Please enter a valid command.")
+            except KeyboardInterrupt:
+                logging.info("Calculator interrupted by user.")
+                print("\nExiting calculator. Goodbye!")
+                break
+            except ImportError as e:
+                logging.error("Unexpected error: %s", e)  # Changed to lazy formatting
+                print("An unexpected error occurred. Check logs for details.")
 
-            if command_name:
-                self.command_handler.execute_command(command_name, *args)
-            else:
-                print("Please enter a valid command.")
+if __name__ == "__main__":
+    calculator = Calculator()
+    calculator.start()
