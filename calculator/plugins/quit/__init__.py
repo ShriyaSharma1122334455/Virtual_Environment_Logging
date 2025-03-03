@@ -6,7 +6,12 @@ the program gracefully with a farewell message.
 """
 
 import sys
+import logging
 from calculator.commands import Command
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 class QuitCommand(Command):
     """
@@ -22,6 +27,7 @@ class QuitCommand(Command):
 
         This method terminates the program and displays a farewell message.
         """
+        logger.info("QuitCommand executed. Exiting the program.")
         sys.exit("Bye Bye")
 
 # Expose the QuitCommand class for external use

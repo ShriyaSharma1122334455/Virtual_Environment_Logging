@@ -5,8 +5,13 @@ This module provides the MultiplyCommand class, which performs the multiplicatio
 of two numerical arguments while handling invalid input errors.
 """
 
+import logging
 from decimal import Decimal, InvalidOperation
 from calculator.commands import Command
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 class MultiplyCommand(Command):
     """
@@ -31,12 +36,16 @@ class MultiplyCommand(Command):
             The product of the two numbers if valid inputs are provided.
             Error message if invalid inputs are encountered.
         """
+        logger.info("Executing MultiplyCommand with arguments: %s", args)
+        
         try:
             a, b = map(Decimal, args)
             product = a * b
             print(f"The solution of multiplication is {product}")
+            logger.info("Multiplication successful: %s * %s = %s", a, b, product)
         except InvalidOperation:
             print("Error: Invalid input. Please enter valid numbers.")
+            logger.error("Error: Invalid input. Unable to convert arguments to Decimal: %s", args)
 
 # Expose the MultiplyCommand class for external use
 __all__ = ["MultiplyCommand"]

@@ -1,3 +1,8 @@
+"""
+Calculator module for managing the command-line interface (CLI) calculator.
+Supports dynamically loading plugins that extend functionality.
+"""
+
 import os
 import pkgutil
 import importlib
@@ -31,7 +36,8 @@ class Calculator:
 
     def setup_logging(self):
         """
-        Configures logging settings.
+        Configures logging settings, creating a 'logs' directory if it doesn't exist.
+        Loads logging configuration from 'logging.conf' or sets basic logging configuration.
         """
         os.makedirs('logs', exist_ok=True)
         logging_conf_path = 'logging.conf'
@@ -43,15 +49,19 @@ class Calculator:
 
     def load_environment_variables(self):
         """
-        Loads environment variables into a dictionary.
+        Loads environment variables into a dictionary and logs the process.
+
+        Returns:
+            dict: A dictionary containing environment variables.
         """
-        settings = {key: value for key, value in os.environ.items()}
+        settings = dict(os.environ.items())  # Replaced the comprehension with the suggested method
         logging.info("Environment variables loaded.")
         return settings
 
     def load_plugins(self):
         """
-        Dynamically loads all plugins from the `calculator.plugins` package.
+        Dynamically loads all plugins from the `calculator.plugins` package and registers commands.
+        Logs each plugin load and command registration.
         """
         all_package = calculator.plugins
         
@@ -59,9 +69,9 @@ class Calculator:
                 all_package.__path__, all_package.__name__ + "."):
             try:
                 module = importlib.import_module(module_name)
-                logging.info(f"Loaded plugin module: {module_name}")
+                logging.info("Loaded plugin module: %s", module_name)  # Changed to lazy formatting
             except ImportError as e:
-                logging.error(f"Error loading plugin {module_name}: {e}")
+                logging.error("Error loading plugin %s: %s", module_name, e)  # Changed to lazy formatting
                 continue
 
             for attr_name in dir(module):
@@ -72,13 +82,14 @@ class Calculator:
                         command_instance = attr(self.command_handler) if "command_handler" in init_signature.parameters else attr()
                         command_name = getattr(command_instance, 'command_name', module_name.split(".")[-1])
                         self.command_handler.register_command(command_name, command_instance)
-                        logging.info(f"Registered command: {command_name}")
+                        logging.info("Registered command: %s", command_name)  # Changed to lazy formatting
                     except TypeError as e:
-                        logging.warning(f"Skipping {attr_name} due to error: {e}")
+                        logging.warning("Skipping %s due to error: %s", attr_name, e)  # Changed to lazy formatting
 
     def start(self):
         """
-        Starts the CLI loop for the calculator.
+        Starts the CLI loop for the calculator, accepting user commands until 'quit' is entered.
+        Handles invalid inputs and logs errors.
         """
         logging.info("Calculator CLI started.")
         print("Calculator CLI - Type 'quit' to exit OR Menu to Continue")
@@ -103,8 +114,8 @@ class Calculator:
                 logging.info("Calculator interrupted by user.")
                 print("\nExiting calculator. Goodbye!")
                 break
-            except Exception as e:
-                logging.error(f"Unexpected error: {e}")
+            except ImportError as e:
+                logging.error("Unexpected error: %s", e)  # Changed to lazy formatting
                 print("An unexpected error occurred. Check logs for details.")
 
 if __name__ == "__main__":

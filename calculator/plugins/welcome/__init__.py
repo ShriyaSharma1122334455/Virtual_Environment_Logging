@@ -5,7 +5,12 @@ This module provides the WelcomeCommand class, which displays a welcome
 message when executed.
 """
 
+import logging
 from calculator.commands import Command
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 class WelcomeCommand(Command):
     """
@@ -22,6 +27,7 @@ class WelcomeCommand(Command):
         This method prints a welcome message to the user.
         """
         print("Hello, Welcome to Calculator")
+        logger.info("Welcome message displayed to the user.")
 
 # Expose the WelcomeCommand class for external use
 __all__ = ["WelcomeCommand"]

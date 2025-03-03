@@ -3,10 +3,8 @@ Test suite for the Calculator class with logging and environment variables.
 """
 
 import os
-import pytest
 import logging
 from calculator import Calculator
-from dotenv import load_dotenv
 
 
 # Configure logging
