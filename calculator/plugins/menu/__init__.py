@@ -37,8 +37,9 @@ class MenuCommand(Command):
         and prints them in a sorted order. Also, displays a prompt to quit the application.
         """
         print("\nAvailable Commands:\n" + "-" * 20)
+        print("Type the operation along with 2 integers to perfom on separated by space")
         for command in sorted(self.command_handler.commands.keys()):
-            print(f" - {command}")
+            print(f" - {command} ")
         print("\nType 'quit' to exit.\n")
 
 # Expose the MenuCommand class for external use

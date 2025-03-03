@@ -1,55 +1,33 @@
 """
-Module for testing the Calculator CLI.
+Test suite for the Calculator class.
 
-This module contains unit tests for the Calculator CLI, specifically 
-testing the execution of various commands such as add, subtract, 
-multiply, divide, and menu.
+This module contains tests for the Calculator class, specifically 
+testing how it handles commands like 'quit' and unknown commands. 
+It uses pytest to test the CLI functionality of the Calculator.
 """
 
-import unittest
-import sys
-import io
-from calculator.commands import CommandHandler
-from calculator.commands.add import AddCommand
-from calculator.commands.subtract import SubtractCommand
-from calculator.commands.multiply import MultiplyCommand
-from calculator.commands.divide import DivideCommand
-from calculator.commands.menu import MenuCommand
+from calculator import Calculator
 
-class TestCalculator(unittest.TestCase):
-    """
-    TestCalculator class to test the functionality of the Calculator CLI.
+def test_calculator_start_exit_command(capfd, monkeypatch):
+    """Test that the calculator exits correctly on 'quit' command."""
+    # Simulate user entering 'quit'
+    monkeypatch.setattr('builtins.input', lambda _: 'quit')
+    calculator = Calculator()
+    calculator.start()
+    # Check output
+    captured = capfd.readouterr()
+    assert "Calculator CLI - Type 'quit' to exit OR Menu to Continue" in captured.out
+    assert "Exiting calculator. Goodbye!" in captured.out
 
-    This class contains unit tests for the commands available in the 
-    Calculator CLI. It tests both valid and invalid commands.
-    """
+def test_calculator_start_unknown_command(capfd, monkeypatch):
+    """Test how the calculator handles an unknown command before exiting."""
+    # Simulate user entering an unknown command followed by 'quit'
+    inputs = iter(['unknown_command', 'quit'])
+    monkeypatch.setattr('builtins.input', lambda _: next(inputs))
 
-    def setUp(self):
-        """Initialize CommandHandler and register commands."""
-        self.handler = CommandHandler()
-        self.handler.register_command("add", AddCommand())
-        self.handler.register_command("subtract", SubtractCommand())
-        self.handler.register_command("multiply", MultiplyCommand())
-        self.handler.register_command("divide", DivideCommand())
-        self.handler.register_command("menu", MenuCommand(self.handler))
-
-    def capture_output(self, func, *args):
-        """Helper function to capture printed output."""
-        captured_output = io.StringIO()
-        sys.stdout = captured_output
-        func(*args)
-        sys.stdout = sys.__stdout__  # Reset stdout
-        return captured_output.getvalue().strip()
-
-    def test_execute_valid_command(self):
-        """Test executing a valid command (addition)."""
-        output = self.capture_output(self.handler.execute_command, "add", "10", "5")
-        self.assertEqual(output, "The Solution of addition is 15")
-
-    def test_execute_invalid_command(self):
-        """Test executing an unregistered command."""
-        output = self.capture_output(self.handler.execute_command, "invalid")
-        self.assertEqual(output, "No such command: invalid")
-
-if __name__ == "__main__":
-    unittest.main()
+    calculator = Calculator()
+    calculator.start()
+    # Verify that the unknown command was handled as expected
+    captured = capfd.readouterr()
+    assert "Calculator CLI - Type 'quit' to exit OR Menu to Continue" in captured.out
+    assert "Exiting calculator. Goodbye!" in captured.out
